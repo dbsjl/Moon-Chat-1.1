@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071329">
+  <title>Moon Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2';"></script>
+</head>
+<body>
+  <div class="stars"></div>
+  <main class="auth-wrap" id="authView">
+    <section class="auth-card">
+      <div class="moon-logo" aria-hidden="true"></div>
+      <h1>Moon <span>Chat</span></h1>
+      <p class="muted center" id="authSubtitle">Твой мир. Твои сообщения.</p>
+      <div class="auth-tabs">
+        <button class="tab active" id="loginTab">Войти</button>
+        <button class="tab" id="signupTab">Создать аккаунт</button>
+      </div>
+      <form id="authForm">
+        <label id="nameLabel" class="hidden">Имя пользователя
+          <input id="displayName" autocomplete="nickname" placeholder="Например, Luna" maxlength="24">
+        </label>
+        <label>Электронная почта
+          <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        </label>
+        <label id="passwordLabel">Пароль
+          <input id="password" type="password" autocomplete="current-password" placeholder="Не менее 6 символов" minlength="6" required>
+        </label>
+        <p id="passwordWarning" class="password-warning hidden">Важно: если забудешь пароль, восстановить его через приложение сейчас нельзя. Сохрани пароль в надёжном месте.</p>
+        <button class="primary full" id="authSubmit" type="submit">Войти <span>→</span></button>
+      </form>
+      <p id="authMessage" class="notice" role="status"></p>
+      <p class="tiny center">Защищённый вход · Moon Chat</p>
+    </section>
+  </main>
+
+  <main class="app-shell hidden" id="appView">
+    <aside class="sidebar">
+      <div class="brand"><div class="mini-moon"></div><div><b>Moon <span>Chat</span></b><small>Твой космос общения</small></div></div>
+      <div class="side-label">МЕНЮ</div>
+      <button class="nav-item active" id="chatsNav" title="Чаты" aria-label="Чаты"><span>▤</span><b>Чаты</b><i id="chatCount">0</i></button>
+      <button class="nav-item" id="contactsNav" title="Найти человека" aria-label="Найти человека"><span>♧</span><b>Найти человека</b></button>
+      <button class="user-mini" id="userSettingsBtn" type="button" title="Открыть настройки">
+        <div class="avatar" id="myAvatar">M</div>
+        <div class="user-mini-text"><b id="myName">Пользователь</b><small id="myId">MC-…</small></div>
+        <span class="user-settings-icon" aria-hidden="true">⚙</span>
+      </button>
+    </aside>
+
+    <section class="list-pane">
+      <div class="pane-heading"><div><h2 id="listTitle">Сообщения</h2><p id="listSubtitle">Твои разговоры под звёздами</p></div><div class="heading-actions"><button class="icon-btn mobile-settings-btn" id="mobileSettingsBtn" type="button" title="Настройки" aria-label="Настройки">⚙</button><button class="round-btn" id="newChatBtn" title="Найти пользователя">＋</button></div></div>
+      <div class="search-wrap"><span>⌕</span><input id="chatSearch" placeholder="Поиск чатов"></div>
+      <div id="chatList" class="chat-list"></div>
+      <div id="emptyChats" class="empty-state"><div class="empty-orbit"></div><b>Пока тихо во Вселенной</b><p>Найди друга по его Moon ID, чтобы начать чат.</p><button class="secondary" id="emptyFindBtn">Найти человека</button></div>
+    </section>
+
+    <section class="conversation-pane" id="conversationPane">
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="big-moon"></div><h2>Добро пожаловать в <span>Moon Chat</span></h2>
+        <p>Каждый разговор — маленькая вселенная.</p><button class="primary" id="welcomeFindBtn">Начать общение <span>→</span></button>
+      </div>
+      <div id="conversationView" class="hidden conversation-view">
+        <header class="conversation-header">
+          <button class="icon-btn mobile-back" id="mobileBack" title="К чатам" aria-label="К чатам">←</button>
+          <div class="avatar" id="peerAvatar">A</div><div class="peer-info"><b id="peerName">Собеседник</b><small><span class="online-dot"></span> Личный чат · <span id="peerId">MC-…</span></small></div>
+          <button class="icon-btn" id="refreshBtn" title="Обновить">⟳</button>
+        </header>
+        <div id="messages" class="messages"></div>
+        <form id="messageForm" class="composer">
+          <label class="attach-btn" for="photoInput" title="Отправить фото" aria-label="Отправить фото">＋</label>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+          <input id="messageInput" placeholder="Написать сообщение…" maxlength="4000" autocomplete="off">
+          <button class="send-btn" type="submit" aria-label="Отправить">➤</button>
+        </form>
+        <div class="composer-note">Не отправляй пароли и другую конфиденциальную информацию.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <dialog id="findDialog">
+    <form method="dialog" class="dialog-top"><div><h2>Найти человека</h2><p>Введи уникальный Moon ID друга.</p></div><button class="icon-btn" aria-label="Закрыть">✕</button></form>
+    <form id="findForm" class="find-form"><label>Moon ID<input id="findId" placeholder="MC-12AB34CD" required maxlength="16" autocomplete="off"></label><button class="primary full" type="submit">Найти <span>→</span></button></form>
+    <div id="findResult" class="find-result"></div>
+  </dialog>
+  <dialog id="settingsDialog">
+    <form method="dialog" class="dialog-top"><div><h2>Настройки</h2><p>Управление аккаунтом Moon Chat</p></div><button class="icon-btn" aria-label="Закрыть">✕</button></form>
+    <div class="settings-account"><div class="avatar" id="settingsAvatar">M</div><div><b id="settingsName">Пользователь</b><small id="settingsEmail">почта</small></div></div>
+    <div class="info-card"><small>ТВОЙ MOON ID</small><div class="id-line"><b id="settingsId">MC-…</b><button class="icon-btn" id="settingsCopyId" type="button" title="Скопировать ID">▣</button></div></div>
+    <p class="settings-note">Вход по электронной почте и паролю. Если забудешь пароль, восстановить его через приложение сейчас нельзя — сохрани его в надёжном месте.</p>
+    <button class="secondary full" id="logoutBtn" type="button">↪ Выйти из аккаунта</button>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
